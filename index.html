@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AP Biology: Catalase Floating Disc Assay Simulation</title>
+  <style>
+    :root {
+      --primary: #1e3a8a;
+      --primary-light: #2563eb;
+      --accent: #0d9488;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --muted: #64748b;
+      --border: #cbd5e1;
+      --success: #16a34a;
+      --warning: #d97706;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.5;
+      padding-bottom: 50px;
+    }
+
+    header {
+      background: linear-gradient(135deg, var(--primary), #0f172a);
+      color: white;
+      padding: 1.25rem 2rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    header h1 { font-size: 1.4rem; font-weight: 700; }
+    header p { font-size: 0.85rem; color: #cbd5e1; }
+
+    .student-meta {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      align-items: center;
+      background: rgba(255,255,255,0.1);
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+    }
+
+    .student-meta label { font-size: 0.8rem; font-weight: 600; display: flex; flex-direction: column; gap: 2px; }
+    .student-meta input {
+      padding: 0.35rem 0.6rem;
+      border-radius: 4px;
+      border: 1px solid #94a3b8;
+      font-size: 0.85rem;
+      background: white;
+      color: var(--text);
+    }
+
+    .nav-tabs {
+      display: flex;
+      background: white;
+      border-bottom: 2px solid var(--border);
+      padding: 0 2rem;
+      gap: 0.5rem;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 0.85rem 1.25rem;
+      border: none;
+      background: none;
+      font-weight: 600;
+      font-size: 0.92rem;
+      color: var(--muted);
+      cursor: pointer;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover { color: var(--primary-light); }
+    .tab-btn.active {
+      color: var(--primary-light);
+      border-bottom-color: var(--primary-light);
+    }
+
+    .container { max-width: 1200px; margin: 1.5rem auto; padding: 0 1.5rem; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+    }
+
+    h2 { font-size: 1.25rem; color: var(--primary); margin-bottom: 0.75rem; border-bottom: 2px solid #e2e8f0; padding-bottom: 0.4rem; }
+    h3 { font-size: 1.05rem; color: #334155; margin: 1rem 0 0.5rem; }
+
+    /* Simulation Layout */
+    .sim-grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .sim-grid { grid-template-columns: 1fr; }
+    }
+
+    .control-group { margin-bottom: 1rem; }
+    .control-group label { display: block; font-weight: 600; font-size: 0.88rem; margin-bottom: 0.35rem; }
+    select, button, input[type="text"], input[type="number"] {
+      font-family: inherit;
+    }
+    select {
+      width: 100%;
+      padding: 0.55rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.92rem;
+      background: #fff;
+    }
+
+    .prep-box {
+      background: #f1f5f9;
+      border-left: 4px solid var(--accent);
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+
+    .btn-row { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.75rem; }
+    .btn {
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      border: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: opacity 0.15s, transform 0.05s;
+    }
+    .btn:active { transform: translateY(1px); }
+    .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+    .btn-primary { background: var(--primary-light); color: white; flex: 1; }
+    .btn-secondary { background: #e2e8f0; color: #334155; }
+    .btn-accent { background: var(--accent); color: white; }
+    .btn-print { background: #16a34a; color: white; }
+
+    /* Lab Bench Canvas Area */
+    .bench-area {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      background: linear-gradient(to bottom, #f8fafc 0%, #e2e8f0 100%);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1.25rem;
+      position: relative;
+    }
+
+    .bench-top-bar {
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.75rem;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+
+    .stopwatch {
+      font-family: "Courier New", Courier, monospace;
+      background: #0f172a;
+      color: #38bdf8;
+      font-size: 1.5rem;
+      font-weight: 700;
+      padding: 0.4rem 1rem;
+      border-radius: 8px;
+      border: 2px solid #475569;
+      min-width: 145px;
+      text-align: center;
+    }
+
+    .status-badge {
+      padding: 0.4rem 0.85rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      background: #e0f2fe;
+      color: #0369a1;
+    }
+
+    #simCanvas {
+      background: #ffffff;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      max-width: 100%;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.05);
+    }
+
+    .speed-toggle {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 0.75rem 0 1.5rem;
+      font-size: 0.88rem;
+    }
+
+    th, td {
+      border: 1px solid var(--border);
+      padding: 0.55rem 0.65rem;
+      text-align: center;
+    }
+
+    th { background: #f1f5f9; font-weight: 700; color: #334155; }
+    td.recorded-val { font-family: monospace; font-size: 0.95rem; font-weight: 600; color: var(--primary); background: #f8fafc; }
+    td.class-val { font-family: monospace; font-size: 0.9rem; color: #475569; background: #f1f5f9; }
+    td input.student-calc {
+      width: 95px;
+      padding: 0.3rem 0.4rem;
+      border: 1px solid #94a3b8;
+      border-radius: 4px;
+      text-align: center;
+      font-size: 0.88rem;
+      background: #fffbeb;
+    }
+
+    /* Graphing Tool */
+    .graph-grid-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+    }
+
+    @media (max-width: 950px) {
+      .graph-grid-container { grid-template-columns: 1fr; }
+    }
+
+    .graph-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      background: #fff;
+    }
+
+    .graph-controls {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    .graph-controls label { display: flex; flex-direction: column; font-weight: 600; gap: 2px; }
+    .graph-controls input { padding: 0.3rem; border: 1px solid var(--border); border-radius: 4px; font-size: 0.8rem; }
+    .graph-canvas-wrap { text-align: center; }
+    canvas.plot-canvas {
+      border: 1px solid #94a3b8;
+      background: #ffffff;
+      cursor: crosshair;
+      max-width: 100%;
+    }
+
+    /* Questions */
+    .question-block {
+      margin-bottom: 1.25rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .question-block label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.4rem;
+      color: #1e293b;
+    }
+    .question-block textarea {
+      width: 100%;
+      min-height: 75px;
+      padding: 0.6rem;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-family: inherit;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+
+    .sub-questions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 0.5rem;
+    }
+    @media (max-width: 650px) {
+      .sub-questions { grid-template-columns: 1fr; }
+    }
+
+    /* Print Stylesheet */
+    @media print {
+      header { background: none !important; color: black !important; border-bottom: 2px solid #000; padding: 0.5rem 0; }
+      header p, .nav-tabs, .no-print { display: none !important; }
+      .student-meta { background: none; padding: 0; }
+      .student-meta input { border: none; border-bottom: 1px solid #000; border-radius: 0; padding: 2px; }
+      .container { max-width: 100%; margin: 0; padding: 0; }
+      .tab-content { display: block !important; margin-bottom: 1.5rem; }
+      #tab-bench, #tab-intro { display: none !important; }
+      .card { box-shadow: none; border: 1px solid #999; page-break-inside: avoid; margin-bottom: 1rem; padding: 1rem; }
+      .graph-grid-container { grid-template-columns: 1fr 1fr; gap: 1rem; }
+      .graph-controls { display: none !important; }
+      td input.student-calc { border: none; background: transparent; width: auto; font-weight: bold; }
+      textarea { border: 1px solid #999; min-height: 55px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>AP Biology: Enzyme Activity (Potato Catalase Assay)</h1>
+    <p>Floating Filter Paper Disc Bioassay &bull; Reaction: 2H₂O₂ + Catalase &rarr; 2H₂O + O₂ + Catalase</p>
+  </div>
+  <div class="student-meta">
+    <label>Student Name
+      <input type="text" id="studentName" placeholder="First & Last Name">
+    </label>
+    <label>Lab Partner(s)
+      <input type="text" id="labPartners" placeholder="Partner Name(s)">
+    </label>
+    <label>Date
+      <input type="date" id="labDate">
+    </label>
+    <button class="btn btn-print no-print" onclick="window.print()" title="Print or Save Lab Report as PDF">Print / Export PDF</button>
+  </div>
+</header>
+
+<nav class="nav-tabs no-print">
+  <button class="tab-btn active" onclick="switchTab('tab-bench', this)">1. Virtual Lab Bench</button>
+  <button class="tab-btn" onclick="switchTab('tab-tables', this)">2. Data Tables (1–4)</button>
+  <button class="tab-btn" onclick="switchTab('tab-graphs', this)">3. Student Graphing</button>
+  <button class="tab-btn" onclick="switchTab('tab-questions', this)">4. Discussion & Report Questions</button>
+  <button class="tab-btn" onclick="switchTab('tab-intro', this)">5. Lab Manual & Procedure</button>
+</nav>
+
+<div class="container">
+
+  <!-- TAB 1: VIRTUAL LAB BENCH -->
+  <section id="tab-bench" class="tab-content active">
+    <div class="sim-grid">
+      <div class="card">
+        <h2>Assay Configuration</h2>
+        <div class="control-group">
+          <label for="expSelect">Select Experiment Section:</label>
+          <select id="expSelect" onchange="updateConditionOptions()">
+            <option value="part1">Part I: Effect of Catalase Concentration</option>
+            <option value="part2">Part II: Effect of Substrate (H₂O₂) Concentration</option>
+            <option value="part3">Part III: Effect of Temperature</option>
+            <option value="part4">Part IV: Effect of Enzyme Inhibition (Hydroxylamine)</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="condSelect">Select Experimental Condition (Beaker):</label>
+          <select id="condSelect" onchange="updatePrepDetails()"></select>
+        </div>
+
+        <div class="prep-box" id="prepDetails"></div>
+
+        <div class="control-group">
+          <label>Assay Protocol Steps:</label>
+          <ol style="font-size: 0.83rem; padding-left: 1.2rem; color: #334155;">
+            <li>Keep potato catalase stock (100 units/mL) in an ice bath (4&deg;C).</li>
+            <li>Immerse 2.1 cm filter paper disc into enzyme solution for <strong>5 seconds</strong> using forceps.</li>
+            <li>Drain disc on paper towel for <strong>10 seconds</strong>.</li>
+            <li>Place disc at the bottom of the 40 mL H₂O₂ beaker and time until the disc floats flat on top of the solution.</li>
+          </ol>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" id="runTrial1Btn" onclick="startAssay(1)">Run Trial 1</button>
+          <button class="btn btn-accent" id="runTrial2Btn" onclick="startAssay(2)">Run Trial 2</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-secondary" id="resetSimBtn" onclick="resetBench()" style="width:100%;">Reset Beaker</button>
+        </div>
+
+        <div style="margin-top: 1rem; padding-top: 0.75rem; border-top: 1px solid var(--border); font-size: 0.83rem; color: var(--muted);">
+          <strong>Last Recorded Result:</strong>
+          <div id="lastResultLog" style="margin-top:0.25rem; color: var(--text); font-weight:600;">No trials run yet.</div>
+        </div>
+      </div>
+
+      <div class="bench-area">
+        <div class="bench-top-bar">
+          <span class="status-badge" id="assayPhaseBadge">Ready: Select condition &amp; click Run Trial</span>
+          <div class="speed-toggle">
+            <label for="simSpeed">Simulation Speed:</label>
+            <select id="simSpeed" style="width: auto; padding: 0.25rem 0.5rem;">
+              <option value="1">1x (Real Time)</option>
+              <option value="4" selected>4x (Fast Lab)</option>
+              <option value="10">10x (Rapid Testing)</option>
+            </select>
+          </div>
+          <div class="stopwatch" id="stopwatchDisplay">0.0 s</div>
+        </div>
+
+        <canvas id="simCanvas" width="680" height="400"></canvas>
+
+        <div style="width: 100%; display: flex; justify-content: space-between; font-size: 0.82rem; color: var(--muted); margin-top: 0.5rem;">
+          <span> Left: Catalase Extract (in Ice Bath)</span>
+          <span>Center: Paper Towel Drain (10s)</span>
+          <span>Right: 50 mL Reaction Beaker (40 mL H₂O₂)</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2: DATA TABLES -->
+  <section id="tab-tables" class="tab-content">
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+        <h2>Data Tables (Parts I – IV)</h2>
+        <span class="no-print" style="font-size:0.85rem; color:var(--muted);">
+          <em>Note: Trial 1 &amp; Trial 2 populate automatically from the Virtual Lab Bench. Calculate the <strong>Average</strong> and <strong>Rate (R = 1/t)</strong> yourself!</em>
+        </span>
+      </div>
+
+      <!-- TABLE 1 -->
+      <h3>Table 1 – Effect of Enzyme Concentration on Rate of Activity (Substrate: 40 mL of 3.0% H₂O₂ at 22&deg;C)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Enzyme Conc. (%)</th>
+            <th>Enzyme Conc. (units/mL)</th>
+            <th>Trial 1 Time to Float (s)</th>
+            <th>Trial 2 Time to Float (s)</th>
+            <th>Your Average Time (s)</th>
+            <th>Your Rate R = 1/t (s⁻¹)</th>
+            <th>Class Average Rate (s⁻¹)</th>
+          </tr>
+        </thead>
+        <tbody id="table1Body"></tbody>
+      </table>
+
+      <!-- TABLE 2 -->
+      <h3>Table 2 – Effect of Substrate Concentration on Enzyme Activity (Enzyme: 100 units/mL at 22&deg;C)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Substrate Concentration (Serial Dilution)</th>
+            <th>Trial 1 Time to Float (s)</th>
+            <th>Trial 2 Time to Float (s)</th>
+            <th>Your Average Time (s)</th>
+            <th>Your Rate R = 1/t (s⁻¹)</th>
+            <th>Class Average Rate (s⁻¹)</th>
+          </tr>
+        </thead>
+        <tbody id="table2Body"></tbody>
+      </table>
+
+      <!-- TABLE 3 -->
+      <h3>Table 3 – Effect of Temperature on Rate of Enzyme Activity (100 units/mL Catalase; 3.0% H₂O₂)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Temperature (&deg;C)</th>
+            <th>Exact Bath Temp (&deg;C)</th>
+            <th>Trial 1 Time to Float (s)</th>
+            <th>Trial 2 Time to Float (s)</th>
+            <th>Your Average Time (s)</th>
+            <th>Your Rate R = 1/t (s⁻¹)</th>
+            <th>Class Average Rate (s⁻¹)</th>
+          </tr>
+        </thead>
+        <tbody id="table3Body"></tbody>
+      </table>
+
+      <!-- TABLE 4 -->
+      <h3>Table 4 – Effect of an Inhibitor (Hydroxylamine) on Enzyme Activity (100 units/mL Catalase; 3.0% H₂O₂)</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Enzyme Condition (units/mL)</th>
+            <th>Trial 1 Time to Float (s)</th>
+            <th>Trial 2 Time to Float (s)</th>
+            <th>Your Average Time (s)</th>
+            <th>Your Rate R = 1/t (s⁻¹)</th>
+            <th>Class Average Rate (s⁻¹)</th>
+          </tr>
+        </thead>
+        <tbody id="table4Body"></tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- TAB 3: STUDENT GRAPHING -->
+  <section id="tab-graphs" class="tab-content">
+    <div class="card">
+      <h2>Student Graphing Workspace</h2>
+      <p class="no-print" style="font-size: 0.88rem; color: var(--muted); margin-bottom: 1rem;">
+        Set your graph title, axis labels, and numerical scales for each experiment. Click directly on the grid to plot data points for your calculated rates or class average rates. Click an existing point to remove it.
+      </p>
+
+      <div class="graph-grid-container" id="graphsContainer"></div>
+    </div>
+  </section>
+
+  <!-- TAB 4: DISCUSSION & QUESTIONS -->
+  <section id="tab-questions" class="tab-content">
+    <div class="card">
+      <h2>Discussion and Report Questions</h2>
+      <p class="no-print" style="font-size: 0.88rem; color: var(--muted); margin-bottom: 1rem;">
+        Type your responses below. All responses are automatically saved in your browser session and formatted for printing/PDF export.
+      </p>
+
+      <div class="question-block">
+        <label>1. Basic questions of the experiment:</label>
+        <div class="sub-questions">
+          <div>
+            <label style="font-size:0.85rem;">1a. What is the enzyme of this reaction?</label>
+            <textarea id="q1a" placeholder="Enter your answer..."></textarea>
+          </div>
+          <div>
+            <label style="font-size:0.85rem;">1b. What is the substrate of this reaction?</label>
+            <textarea id="q1b" placeholder="Enter your answer..."></textarea>
+          </div>
+          <div>
+            <label style="font-size:0.85rem;">1c. What is the product of this reaction?</label>
+            <textarea id="q1c" placeholder="Enter your answer..."></textarea>
+          </div>
+          <div>
+            <label style="font-size:0.85rem;">1d. What is the gas produced and how could you demonstrate that?</label>
+            <textarea id="q1d" placeholder="Enter your answer..."></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="question-block">
+        <label for="q2">2. How does enzyme activity vary with enzyme concentration?</label>
+        <textarea id="q2" placeholder="Support your answer using data from Table 1..."></textarea>
+      </div>
+
+      <div class="question-block">
+        <label for="q3">3. How is the rate of enzyme activity affected by increasing the concentration of the substrate?</label>
+        <textarea id="q3" placeholder="Support your answer using data from Table 2..."></textarea>
+      </div>
+
+      <div class="question-block">
+        <label for="q4">4. What do you think would happen if you increased the substrate concentration to 40.0% hydrogen peroxide?</label>
+        <textarea id="q4" placeholder="Explain in terms of active site saturation and reaction kinetics..."></textarea>
+      </div>
+
+      <div class="question-block">
+        <label for="q5">5. How does changing the substrate concentration compare to changing the enzyme concentration in this experiment?</label>
+        <textarea id="q5" placeholder="Compare the relationships observed in Part I and Part II..."></textarea>
+      </div>
+
+      <div class="question-block">
+        <label for="q6">6. Explain the results when the hydroxylamine is added to the enzyme.</label>
+        <textarea id="q6" placeholder="Discuss how hydroxylamine interacts with the iron atom of catalase and affects the active site..."></textarea>
+      </div>
+
+      <div class="question-block">
+        <label for="q7">7. From the temperature data, what can you conclude about how temperature affects enzyme activity? How would you explain the results?</label>
+        <textarea id="q7" placeholder="Discuss kinetic energy, molecular collisions, and thermal denaturation..."></textarea>
+      </div>
+
+      <div class="question-block">
+        <label for="q8">8. What is meant by optimum temperature? According to the class data, what is the optimum temperature for the potato catalase and why?</label>
+        <textarea id="q8" placeholder="Identify the optimum temperature from Table 3 and explain its biological significance..."></textarea>
+      </div>
+
+      <div class="question-block">
+        <label for="q9">9. What would you predict if you had first mixed the catalase (100%) in serial solutions of varying pHs of 3, 5, 7, 9, 11? What would you predict would be optimum pH?</label>
+        <textarea id="q9" placeholder="Explain how H+ ion concentration affects charged amino acid side chains (-COOH and -NH2)..."></textarea>
+      </div>
+
+      <div class="question-block">
+        <label for="q10">10. Design a controlled experiment to test the effect of varying pH, temperature, or enzyme concentration.</label>
+        <textarea id="q10" placeholder="Include your hypothesis, independent variable, dependent variable, controlled variables, and control group..."></textarea>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 5: LAB MANUAL & PROCEDURE -->
+  <section id="tab-intro" class="tab-content no-print">
+    <div class="card">
+      <h2>Background &amp; Assay Reference</h2>
+      <p style="margin-bottom: 0.75rem;">
+        In this investigation, you study the enzyme <strong>catalase</strong>, isolated from fresh potato tubers (50 g potato tissue homogenized in 50 mL cold distilled water + crushed ice, filtered through cheesecloth, brought to 100 mL total volume = <strong>100 units/mL</strong> stock kept in an ice bath).
+      </p>
+      <p style="margin-bottom: 0.75rem;">
+        Catalase accelerates the breakdown of toxic hydrogen peroxide ($\text{H}_2\text{O}_2$) in peroxisomes according to the summary reaction:
+        <br><strong>$2\text{H}_2\text{O}_2 + \text{catalase} \rightarrow 2\text{H}_2\text{O} + \text{O}_2 + \text{catalase}$</strong>
+      </p>
+      <h3>Dilution Reference Guides</h3>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+        <div>
+          <strong>Part I: Catalase Serial Dilutions (40 mL total)</strong>
+          <table>
+            <thead><tr><th>Conc %</th><th>Stock Catalase (mL)</th><th>Cold Distilled Water (mL)</th><th>Units/mL</th></tr></thead>
+            <tbody>
+              <tr><td>100%</td><td>40 mL</td><td>0 mL</td><td>100</td></tr>
+              <tr><td>75%</td><td>30 mL</td><td>10 mL</td><td>75</td></tr>
+              <tr><td>50%</td><td>20 mL</td><td>20 mL</td><td>50</td></tr>
+              <tr><td>25%</td><td>10 mL</td><td>30 mL</td><td>25</td></tr>
+              <tr><td>0%</td><td>0 mL</td><td>40 mL</td><td>0</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div>
+          <strong>Part II: Substrate ($\text{H}_2\text{O}_2$) Dilutions (40 mL total)</strong>
+          <table>
+            <thead><tr><th>Beaker</th><th>3.0% H₂O₂ (mL)</th><th>Room-Temp Water (mL)</th></tr></thead>
+            <tbody>
+              <tr><td>0.0%</td><td>0.0 mL</td><td>40.0 mL</td></tr>
+              <tr><td>0.75%</td><td>10.0 mL</td><td>30.0 mL</td></tr>
+              <tr><td>1.5%</td><td>20.0 mL</td><td>20.0 mL</td></tr>
+              <tr><td>2.25%</td><td>30.0 mL</td><td>10.0 mL</td></tr>
+              <tr><td>3.0%</td><td>40.0 mL</td><td>0.0 mL</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<script>
+  // Set today's date by default
+  document.getElementById('labDate').valueAsDate = new Date();
+
+  // Experiment Database
+  const LAB_DATA = {
+    part1: {
+      title: "Part I: Effect of Catalase Concentration",
+      conditions: [
+        { id: "p1_100", label: "100% (100 units/mL)", pct: 100, units: 100, prep: "Mix 40 mL stock enzyme (100 units/mL) + 0 mL cold distilled water. Substrate: 40 mL of 3.0% H₂O₂ at 22°C.", baseTime: 7.4, classRate: "0.135" },
+        { id: "p1_75",  label: "75% (75 units/mL)",  pct: 75,  units: 75,  prep: "Mix 30 mL stock enzyme + 10 mL cold distilled water. Substrate: 40 mL of 3.0% H₂O₂ at 22°C.", baseTime: 9.8, classRate: "0.102" },
+        { id: "p1_50",  label: "50% (50 units/mL)",  pct: 50,  units: 50,  prep: "Mix 20 mL stock enzyme + 20 mL cold distilled water. Substrate: 40 mL of 3.0% H₂O₂ at 22°C.", baseTime: 14.6, classRate: "0.068" },
+        { id: "p1_25",  label: "25% (25 units/mL)",  pct: 25,  units: 25,  prep: "Mix 10 mL stock enzyme + 30 mL cold distilled water. Substrate: 40 mL of 3.0% H₂O₂ at 22°C.", baseTime: 28.8, classRate: "0.035" },
+        { id: "p1_0",   label: "0% (0 units/mL - Control)", pct: 0, units: 0, prep: "0 mL stock enzyme + 40 mL cold distilled water. Substrate: 40 mL of 3.0% H₂O₂ at 22°C.", baseTime: Infinity, classRate: "0.000" }
+      ]
+    },
+    part2: {
+      title: "Part II: Effect of Substrate Concentration",
+      conditions: [
+        { id: "p2_0",    label: "0.0% H₂O₂",  sub: "0.0% H₂O₂",  prep: "Substrate Beaker: 0.0 mL of 3% H₂O₂ + 40.0 mL room-temp water. Enzyme: 100 units/mL in ice bath.", baseTime: Infinity, classRate: "0.000" },
+        { id: "p2_075",  label: "0.75% H₂O₂", sub: "0.75% H₂O₂", prep: "Substrate Beaker: 10.0 mL of 3% H₂O₂ + 30.0 mL room-temp water. Enzyme: 100 units/mL in ice bath.", baseTime: 24.5, classRate: "0.041" },
+        { id: "p2_150",  label: "1.5% H₂O₂",  sub: "1.5% H₂O₂",  prep: "Substrate Beaker: 20.0 mL of 3% H₂O₂ + 20.0 mL room-temp water. Enzyme: 100 units/mL in ice bath.", baseTime: 13.2, classRate: "0.076" },
+        { id: "p2_225",  label: "2.25% H₂O₂", sub: "2.25% H₂O₂", prep: "Substrate Beaker: 30.0 mL of 3% H₂O₂ + 10.0 mL room-temp water. Enzyme: 100 units/mL in ice bath.", baseTime: 9.1, classRate: "0.110" },
+        { id: "p2_300",  label: "3.0% H₂O₂",  sub: "3.0% H₂O₂",  prep: "Substrate Beaker: 40.0 mL of 3% H₂O₂ + 0.0 mL water. Enzyme: 100 units/mL in ice bath.", baseTime: 7.4, classRate: "0.135" }
+      ]
+    },
+    part3: {
+      title: "Part III: Effect of Temperature",
+      conditions: [
+        { id: "p3_4",  label: "4°C (Ice Bath)",          tempLabel: "4",   exactTemp: "4.2°C",  prep: "Water bath at 4°C. 40 mL of 3.0% H₂O₂ + 100 units/mL catalase.", baseTime: 23.4, classRate: "0.043" },
+        { id: "p3_10", label: "10°C (Cold Bath)",        tempLabel: "10",  exactTemp: "10.1°C", prep: "Water bath at 10°C. 40 mL of 3.0% H₂O₂ + 100 units/mL catalase.", baseTime: 14.8, classRate: "0.068" },
+        { id: "p3_22", label: "22°C (Room Temp)",        tempLabel: "22",  exactTemp: "22.0°C", prep: "Water bath at 22°C. 40 mL of 3.0% H₂O₂ + 100 units/mL catalase.", baseTime: 7.5,  classRate: "0.133" },
+        { id: "p3_40", label: "40°C (Warm Bath)",        tempLabel: "40",  exactTemp: "39.8°C", prep: "Water bath at 40°C. 40 mL of 3.0% H₂O₂ + 100 units/mL catalase.", baseTime: 5.2,  classRate: "0.192" },
+        { id: "p3_65", label: "65°C+ (Hot Water Bath)",  tempLabel: "65+", exactTemp: "68.5°C", prep: "Water bath at 68.5°C. 40 mL of 3.0% H₂O₂ + 100 units/mL catalase.", baseTime: Infinity, classRate: "0.000" }
+      ]
+    },
+    part4: {
+      title: "Part IV: Effect of Enzyme Inhibition",
+      conditions: [
+        { id: "p4_ctrl",  label: "Control (100 units/mL Catalase)",                       name: "Control (100 units/mL)", prep: "1 mL of 100 units/mL enzyme extract + 5 drops distilled water (stand 1 min). Assay in 40 mL of 3.0% H₂O₂.", baseTime: 7.4, classRate: "0.135" },
+        { id: "p4_inhib", label: "Hydroxylamine Treated (100 units/mL + 10% Hydroxylamine)", name: "Hydroxylamine (100 units/mL + inhibitor)", prep: "1 mL of 100 units/mL enzyme extract + 5 drops 10% hydroxylamine (stand 1 min). Hydroxylamine binds the iron atom in catalase.", baseTime: Infinity, classRate: "0.000" }
+      ]
+    }
+  };
+
+  // Store recorded trial values
+  const recordedTrials = {};
+
+  function switchTab(tabId, btn) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+    document.getElementById(tabId).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function initTables() {
+    // Table 1
+    const t1 = document.getElementById('table1Body');
+    t1.innerHTML = LAB_DATA.part1.conditions.map(c => `
+      <tr>
+        <td>${c.pct}%</td>
+        <td>${c.units}</td>
+        <td class="recorded-val" id="${c.id}_t1">—</td>
+        <td class="recorded-val" id="${c.id}_t2">—</td>
+        <td><input type="text" class="student-calc" placeholder="Calc Avg"></td>
+        <td><input type="text" class="student-calc" placeholder="Calc 1/t"></td>
+        <td class="class-val">${c.classRate}</td>
+      </tr>
+    `).join('');
+
+    // Table 2
+    const t2 = document.getElementById('table2Body');
+    t2.innerHTML = LAB_DATA.part2.conditions.map(c => `
+      <tr>
+        <td>${c.sub}</td>
+        <td class="recorded-val" id="${c.id}_t1">—</td>
+        <td class="recorded-val" id="${c.id}_t2">—</td>
+        <td><input type="text" class="student-calc" placeholder="Calc Avg"></td>
+        <td><input type="text" class="student-calc" placeholder="Calc 1/t"></td>
+        <td class="class-val">${c.classRate}</td>
+      </tr>
+    `).join('');
+
+    // Table 3
+    const t3 = document.getElementById('table3Body');
+    t3.innerHTML = LAB_DATA.part3.conditions.map(c => `
+      <tr>
+        <td>${c.tempLabel}</td>
+        <td>${c.exactTemp}</td>
+        <td class="recorded-val" id="${c.id}_t1">—</td>
+        <td class="recorded-val" id="${c.id}_t2">—</td>
+        <td><input type="text" class="student-calc" placeholder="Calc Avg"></td>
+        <td><input type="text" class="student-calc" placeholder="Calc 1/t"></td>
+        <td class="class-val">${c.classRate}</td>
+      </tr>
+    `).join('');
+
+    // Table 4
+    const t4 = document.getElementById('table4Body');
+    t4.innerHTML = LAB_DATA.part4.conditions.map(c => `
+      <tr>
+        <td>${c.name}</td>
+        <td class="recorded-val" id="${c.id}_t1">—</td>
+        <td class="recorded-val" id="${c.id}_t2">—</td>
+        <td><input type="text" class="student-calc" placeholder="Calc Avg"></td>
+        <td><input type="text" class="student-calc" placeholder="Calc 1/t"></td>
+        <td class="class-val">${c.classRate}</td>
+      </tr>
+    `).join('');
+  }
+
+  function updateConditionOptions() {
+    const expKey = document.getElementById('expSelect').value;
+    const condSelect = document.getElementById('condSelect');
+    const conditions = LAB_DATA[expKey].conditions;
+    condSelect.innerHTML = conditions.map((c, idx) => `<option value="${idx}">${c.label}</option>`).join('');
+    updatePrepDetails();
+  }
+
+  function updatePrepDetails() {
+    const expKey = document.getElementById('expSelect').value;
+    const condIdx = document.getElementById('condSelect').value;
+    const cond = LAB_DATA[expKey].conditions[condIdx];
+    document.getElementById('prepDetails').innerHTML = `<strong>Preparation Protocol:</strong><br>${cond.prep}`;
+    resetBench();
+  }
+
+  // Canvas Simulation State
+  const canvas = document.getElementById('simCanvas');
+  const ctx = canvas.getContext('2d');
+  let animId = null;
+  let simState = {
+    phase: 'idle', // 'soak', 'drain', 'react', 'done'
+    elapsed: 0,
+    targetReactTime: 10,
+    discX: 115,
+    discY: 120,
+    bubbles: [],
+    condLabel: ''
+  };
+
+  function resetBench() {
+    if (animId) cancelAnimationFrame(animId);
+    simState.phase = 'idle';
+    simState.elapsed = 0;
+    simState.discX = 115;
+    simState.discY = 120;
+    simState.bubbles = [];
+    document.getElementById('stopwatchDisplay').textContent = '0.0 s';
+    document.getElementById('assayPhaseBadge').textContent = 'Ready: Select condition & click Run Trial';
+    document.getElementById('runTrial1Btn').disabled = false;
+    document.getElementById('runTrial2Btn').disabled = false;
+    drawBench();
+  }
+
+  function startAssay(trialNum) {
+    if (animId) cancelAnimationFrame(animId);
+    const expKey = document.getElementById('expSelect').value;
+    const condIdx = document.getElementById('condSelect').value;
+    const cond = LAB_DATA[expKey].conditions[condIdx];
+
+    document.getElementById('runTrial1Btn').disabled = true;
+    document.getElementById('runTrial2Btn').disabled = true;
+
+    // Generate realistic reaction time with +/- 6% random biological noise
+    let reactTime = cond.baseTime;
+    if (isFinite(reactTime)) {
+      const variation = 1 + (Math.random() * 0.12 - 0.06);
+      reactTime = Math.max(1.5, +(reactTime * variation).toFixed(1));
+    }
+
+    simState.targetReactTime = reactTime;
+    simState.condLabel = cond.label;
+    simState.phase = 'soak';
+    simState.elapsed = 0;
+    simState.bubbles = [];
+
+    let lastTimestamp = performance.now();
+
+    function step(now) {
+      const dtReal = (now - lastTimestamp) / 1000;
+      lastTimestamp = now;
+      const speed = parseFloat(document.getElementById('simSpeed').value) || 4;
+      const dt = dtReal * speed;
+
+      simState.elapsed += dt;
+
+      if (simState.phase === 'soak') {
+        document.getElementById('assayPhaseBadge').textContent = 'Step 1/3: Soaking disc in Catalase (5.0 s)...';
+        document.getElementById('stopwatchDisplay').textContent = 'SOAK ' + Math.min(5.0, simState.elapsed).toFixed(1) + 's';
+        simState.discX = 115;
+        simState.discY = 265;
+        if (simState.elapsed >= 5.0) {
+          simState.phase = 'drain';
+          simState.elapsed = 0;
+        }
+      } else if (simState.phase === 'drain') {
+        document.getElementById('assayPhaseBadge').textContent = 'Step 2/3: Draining excess enzyme on paper towel (10.0 s)...';
+        document.getElementById('stopwatchDisplay').textContent = 'DRAIN ' + Math.min(10.0, simState.elapsed).toFixed(1) + 's';
+        simState.discX = 310;
+        simState.discY = 295;
+        if (simState.elapsed >= 10.0) {
+          simState.phase = 'react';
+          simState.elapsed = 0;
+        }
+      } else if (simState.phase === 'react') {
+        const t = simState.elapsed;
+        simState.discX = 525;
+        const bottomY = 315;
+        const topY = 195;
+
+        if (isFinite(simState.targetReactTime)) {
+          document.getElementById('assayPhaseBadge').textContent = 'Step 3/3: Measuring O₂ buoyancy time in H₂O₂...';
+          const progress = Math.min(1, t / simState.targetReactTime);
+          // Ease-in buoyancy curve as O2 bubbles accumulate on fibers
+          const eased = Math.pow(progress, 1.6);
+          simState.discY = bottomY - eased * (bottomY - topY);
+          document.getElementById('stopwatchDisplay').textContent = Math.min(simState.targetReactTime, t).toFixed(1) + ' s';
+
+          // Spawn O2 micro-bubbles around the disc
+          if (Math.random() < 0.65) {
+            simState.bubbles.push({
+              x: simState.discX + (Math.random() * 24 - 12),
+              y: simState.discY - 3,
+              r: 1.5 + Math.random() * 2.5
+            });
+          }
+
+          if (t >= simState.targetReactTime) {
+            finishTrial(cond, trialNum, simState.targetReactTime.toFixed(1));
+            return;
+          }
+        } else {
+          // Non-reactive condition (0% enzyme, 0% substrate, 65C+ denatured, or hydroxylamine inhibitor)
+          document.getElementById('assayPhaseBadge').textContent = 'Step 3/3: Observing disc in H₂O₂ (No O₂ evolution)...';
+          simState.discY = bottomY;
+          // Fast-forward timeout after 15s of sim time to represent >120s no-float
+          const displayClock = Math.min(120.0, t * 8.0);
+          document.getElementById('stopwatchDisplay').textContent = displayClock.toFixed(1) + ' s';
+          if (displayClock >= 120.0) {
+            finishTrial(cond, trialNum, ">120 (No Float)");
+            return;
+          }
+        }
+      }
+
+      // Update rising bubbles
+      simState.bubbles.forEach(b => { b.y -= 1.6; });
+      simState.bubbles = simState.bubbles.filter(b => b.y > 195);
+
+      drawBench();
+      animId = requestAnimationFrame(step);
+    }
+
+    animId = requestAnimationFrame(step);
+  }
+
+  function finishTrial(cond, trialNum, resultStr) {
+    simState.phase = 'done';
+    drawBench();
+    document.getElementById('runTrial1Btn').disabled = false;
+    document.getElementById('runTrial2Btn').disabled = false;
+
+    const cellId = `${cond.id}_t${trialNum}`;
+    const cell = document.getElementById(cellId);
+    if (cell) {
+      cell.textContent = resultStr;
+    }
+
+    document.getElementById('assayPhaseBadge').textContent = `Trial ${trialNum} Complete: Recorded in Data Table!`;
+    document.getElementById('lastResultLog').textContent = `${cond.label} (Trial ${trialNum}): ${resultStr} s`;
+  }
+
+  function drawBench() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Lab Bench Surface
+    ctx.fillStyle = '#cbd5e1';
+    ctx.fillRect(0, 330, canvas.width, 70);
+    ctx.strokeStyle = '#94a3b8';
+    ctx.beginPath();
+    ctx.moveTo(0, 330);
+    ctx.lineTo(canvas.width, 330);
+    ctx.stroke();
+
+    // 1. Left: Ice Bath + Catalase Beaker
+    ctx.fillStyle = 'rgba(186, 230, 253, 0.55)';
+    ctx.strokeStyle = '#64748b';
+    ctx.lineWidth = 2;
+    ctx.fillRect(45, 220, 140, 110);
+    ctx.strokeRect(45, 220, 140, 110);
+    // Ice cubes
+    ctx.fillStyle = 'rgba(255,255,255,0.85)';
+    for (let i = 0; i < 5; i++) {
+      ctx.fillRect(52 + i * 25, 305, 18, 16);
+    }
+    // Inner Enzyme Beaker
+    ctx.fillStyle = 'rgba(254, 240, 138, 0.55)';
+    ctx.fillRect(75, 230, 80, 95);
+    ctx.strokeRect(75, 190, 80, 135);
+    ctx.fillStyle = '#334155';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('Catalase Extract', 115, 178);
+    ctx.font = '11px sans-serif';
+    ctx.fillText('(In 4°C Ice Bath)', 115, 350);
+
+    // 2. Center: Paper Towel Drain Station
+    ctx.fillStyle = '#f8fafc';
+    ctx.strokeStyle = '#94a3b8';
+    ctx.fillRect(250, 310, 120, 18);
+    ctx.strokeRect(250, 310, 120, 18);
+    ctx.fillStyle = '#334155';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.fillText('Paper Towel', 310, 290);
+    ctx.font = '11px sans-serif';
+    ctx.fillText('(10s Drain Step)', 310, 350);
+
+    // 3. Right: 50 mL Reaction Beaker with 40 mL H2O2
+    const expKey = document.getElementById('expSelect').value;
+    const condIdx = document.getElementById('condSelect').value;
+    const cond = LAB_DATA[expKey]?.conditions[condIdx];
+
+    // Optional Temperature Water Bath jacket for Part III
+    if (expKey === 'part3') {
+      ctx.fillStyle = cond.tempLabel === '65+' ? 'rgba(254, 202, 202, 0.45)' : 'rgba(224, 242, 254, 0.5)';
+      ctx.strokeStyle = '#64748b';
+      ctx.fillRect(440, 200, 170, 130);
+      ctx.strokeRect(440, 200, 170, 130);
+      ctx.fillStyle = '#b91c1c';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText(`Water Bath: ${cond.exactTemp}`, 525, 368);
+    }
+
+    // Reaction Beaker Liquid (40 mL level)
+    ctx.fillStyle = 'rgba(219, 234, 254, 0.7)';
+    ctx.fillRect(470, 195, 110, 130);
+    ctx.strokeStyle = '#334155';
+    ctx.lineWidth = 2.5;
+    ctx.strokeRect(470, 160, 110, 165);
+
+    // Graduation marks
+    ctx.strokeStyle = '#64748b';
+    ctx.lineWidth = 1;
+    for (let m = 1; m <= 4; m++) {
+      const y = 325 - m * 32;
+      ctx.beginPath();
+      ctx.moveTo(470, y);
+      ctx.lineTo(485, y);
+      ctx.stroke();
+      ctx.fillStyle = '#475569';
+      ctx.font = '10px sans-serif';
+      ctx.textAlign = 'left';
+      ctx.fillText(`${m * 10} mL`, 488, y + 3);
+    }
+
+    ctx.textAlign = 'center';
+    ctx.fillStyle = '#1e3a8a';
+    ctx.font = 'bold 12px sans-serif';
+    ctx.fillText('40 mL H₂O₂ Assay Beaker', 525, 148);
+    if (cond) {
+      ctx.fillStyle = '#334155';
+      ctx.font = '11px sans-serif';
+      ctx.fillText(cond.label, 525, 350);
+    }
+
+    // Draw O2 Bubbles
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = '#0284c7';
+    ctx.lineWidth = 1;
+    simState.bubbles.forEach(b => {
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, b.r, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.stroke();
+    });
+
+    // Draw Forceps (when soaking or draining or idle)
+    if (simState.phase === 'idle' || simState.phase === 'soak' || simState.phase === 'drain') {
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(simState.discX - 5, simState.discY - 55);
+      ctx.lineTo(simState.discX - 2, simState.discY - 4);
+      ctx.moveTo(simState.discX + 5, simState.discY - 55);
+      ctx.lineTo(simState.discX + 2, simState.discY - 4);
+      ctx.stroke();
+    }
+
+    // Draw 2.1 cm Filter Paper Disc
+    ctx.fillStyle = '#ffffff';
+    ctx.strokeStyle = '#d97706';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(simState.discX, simState.discY, 16, 4.5, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.stroke();
+  }
+
+  // Interactive Student Graphing System
+  const GRAPH_CONFIGS = [
+    { id: 'g1', title: 'Graph 1: Catalase Concentration vs. Rate', xLabel: 'Enzyme Concentration (units/mL)', yLabel: 'Reaction Rate R = 1/t (s⁻¹)', xMax: 100, yMax: 0.20 },
+    { id: 'g2', title: 'Graph 2: Substrate (H₂O₂) Conc. vs. Rate', xLabel: 'Substrate Concentration (%)', yLabel: 'Reaction Rate R = 1/t (s⁻¹)', xMax: 3.0, yMax: 0.20 },
+    { id: 'g3', title: 'Graph 3: Temperature vs. Enzyme Rate', xLabel: 'Temperature (°C)', yLabel: 'Reaction Rate R = 1/t (s⁻¹)', xMax: 70, yMax: 0.25 },
+    { id: 'g4', title: 'Graph 4: Effect of Hydroxylamine Inhibitor', xLabel: 'Condition (1 = Control, 2 = Inhibitor)', yLabel: 'Reaction Rate R = 1/t (s⁻¹)', xMax: 3, yMax: 0.20 }
+  ];
+
+  const graphPlots = { g1: [], g2: [], g3: [], g4: [] };
+
+  function initGraphs() {
+    const container = document.getElementById('graphsContainer');
+    container.innerHTML = GRAPH_CONFIGS.map(cfg => `
+      <div class="graph-card">
+        <div class="graph-controls no-print">
+          <label>Graph Title
+            <input type="text" id="${cfg.id}_title" value="${cfg.title}" oninput="renderGraph('${cfg.id}')">
+          </label>
+          <label>X-Axis Label
+            <input type="text" id="${cfg.id}_xlabel" value="${cfg.xLabel}" oninput="renderGraph('${cfg.id}')">
+          </label>
+          <label>Y-Axis Label
+            <input type="text" id="${cfg.id}_ylabel" value="${cfg.yLabel}" oninput="renderGraph('${cfg.id}')">
+          </label>
+          <label>X-Axis Max
+            <input type="number" id="${cfg.id}_xmax" value="${cfg.xMax}" step="any" oninput="renderGraph('${cfg.id}')">
+          </label>
+          <label>Y-Axis Max
+            <input type="number" id="${cfg.id}_ymax" value="${cfg.yMax}" step="any" oninput="renderGraph('${cfg.id}')">
+          </label>
+        </div>
+        <div class="graph-canvas-wrap">
+          <canvas id="${cfg.id}_canvas" class="plot-canvas" width="480" height="320"></canvas>
+        </div>
+        <div class="no-print" style="display:flex; justify-content:space-between; align-items:center; margin-top:0.5rem; font-size:0.78rem; color:var(--muted);">
+          <span>Click grid to plot point &bull; Click existing point to delete</span>
+          <button class="btn btn-secondary" style="padding:0.25rem 0.6rem; font-size:0.78rem;" onclick="clearGraph('${cfg.id}')">Clear Points</button>
+        </div>
+      </div>
+    `).join('');
+
+    GRAPH_CONFIGS.forEach(cfg => {
+      const c = document.getElementById(`${cfg.id}_canvas`);
+      c.addEventListener('click', (e) => handleGraphClick(cfg.id, e));
+      renderGraph(cfg.id);
+    });
+  }
+
+  function handleGraphClick(gid, event) {
+    const c = document.getElementById(`${gid}_canvas`);
+    const rect = c.getBoundingClientRect();
+    const scaleX = c.width / rect.width;
+    const scaleY = c.height / rect.height;
+    const px = (event.clientX - rect.left) * scaleX;
+    const py = (event.clientY - rect.top) * scaleY;
+
+    const padLeft = 60, padRight = 25, padTop = 35, padBottom = 48;
+    const plotW = c.width - padLeft - padRight;
+    const plotH = c.height - padTop - padBottom;
+
+    if (px < padLeft || px > c.width - padRight || py < padTop || py > c.height - padBottom) return;
+
+    const xMax = parseFloat(document.getElementById(`${gid}_xmax`).value) || 100;
+    const yMax = parseFloat(document.getElementById(`${gid}_ymax`).value) || 0.2;
+
+    // Check if clicking near an existing point to remove it
+    const pts = graphPlots[gid];
+    for (let i = 0; i < pts.length; i++) {
+      const ptPx = padLeft + (pts[i].x / xMax) * plotW;
+      const ptPy = padTop + plotH - (pts[i].y / yMax) * plotH;
+      if (Math.hypot(px - ptPx, py - ptPy) < 10) {
+        pts.splice(i, 1);
+        renderGraph(gid);
+        return;
+      }
+    }
+
+    const valX = +(((px - padLeft) / plotW) * xMax).toPrecision(3);
+    const valY = +(((padTop + plotH - py) / plotH) * yMax).toPrecision(3);
+    pts.push({ x: valX, y: valY });
+    pts.sort((a, b) => a.x - b.x);
+    renderGraph(gid);
+  }
+
+  function clearGraph(gid) {
+    graphPlots[gid] = [];
+    renderGraph(gid);
+  }
+
+  function renderGraph(gid) {
+    const c = document.getElementById(`${gid}_canvas`);
+    const gctx = c.getContext('2d');
+    const title = document.getElementById(`${gid}_title`).value;
+    const xLabel = document.getElementById(`${gid}_xlabel`).value;
+    const yLabel = document.getElementById(`${gid}_ylabel`).value;
+    const xMax = parseFloat(document.getElementById(`${gid}_xmax`).value) || 100;
+    const yMax = parseFloat(document.getElementById(`${gid}_ymax`).value) || 0.2;
+
+    gctx.clearRect(0, 0, c.width, c.height);
+
+    const padLeft = 60, padRight = 25, padTop = 35, padBottom = 48;
+    const plotW = c.width - padLeft - padRight;
+    const plotH = c.height - padTop - padBottom;
+
+    // Grid lines
+    gctx.strokeStyle = '#e2e8f0';
+    gctx.lineWidth = 1;
+    gctx.fillStyle = '#475569';
+    gctx.font = '10px sans-serif';
+
+    const steps = 5;
+    for (let i = 0; i <= steps; i++) {
+      // Horizontal grid
+      const y = padTop + (plotH / steps) * i;
+      const yVal = (yMax * (1 - i / steps)).toFixed(yMax < 1 ? 2 : 1);
+      gctx.beginPath();
+      gctx.moveTo(padLeft, y);
+      gctx.lineTo(padLeft + plotW, y);
+      gctx.stroke();
+      gctx.textAlign = 'right';
+      gctx.fillText(yVal, padLeft - 6, y + 3);
+
+      // Vertical grid
+      const x = padLeft + (plotW / steps) * i;
+      const xVal = (xMax * (i / steps)).toFixed(xMax <= 5 ? 2 : 0);
+      gctx.beginPath();
+      gctx.moveTo(x, padTop);
+      gctx.lineTo(x, padTop + plotH);
+      gctx.stroke();
+      gctx.textAlign = 'center';
+      gctx.fillText(xVal, x, padTop + plotH + 15);
+    }
+
+    // Axes
+    gctx.strokeStyle = '#1e293b';
+    gctx.lineWidth = 2;
+    gctx.beginPath();
+    gctx.moveTo(padLeft, padTop);
+    gctx.lineTo(padLeft, padTop + plotH);
+    gctx.lineTo(padLeft + plotW, padTop + plotH);
+    gctx.stroke();
+
+    // Labels
+    gctx.fillStyle = '#0f172a';
+    gctx.font = 'bold 12px sans-serif';
+    gctx.textAlign = 'center';
+    gctx.fillText(title, c.width / 2, 20);
+
+    gctx.font = '11px sans-serif';
+    gctx.fillText(xLabel, padLeft + plotW / 2, c.height - 10);
+
+    gctx.save();
+    gctx.translate(16, padTop + plotH / 2);
+    gctx.rotate(-Math.PI / 2);
+    gctx.fillText(yLabel, 0, 0);
+    gctx.restore();
+
+    // Plot user points and connecting line
+    const pts = graphPlots[gid];
+    if (pts.length > 0) {
+      gctx.strokeStyle = '#2563eb';
+      gctx.lineWidth = 2;
+      gctx.beginPath();
+      pts.forEach((pt, idx) => {
+        const px = padLeft + (pt.x / xMax) * plotW;
+        const py = padTop + plotH - (pt.y / yMax) * plotH;
+        if (idx === 0) gctx.moveTo(px, py);
+        else gctx.lineTo(px, py);
+      });
+      gctx.stroke();
+
+      pts.forEach(pt => {
+        const px = padLeft + (pt.x / xMax) * plotW;
+        const py = padTop + plotH - (pt.y / yMax) * plotH;
+        gctx.fillStyle = '#1e3a8a';
+        gctx.beginPath();
+        gctx.arc(px, py, 4.5, 0, Math.PI * 2);
+        gctx.fill();
+      });
+    }
+  }
+
+  // Initialize App on Load
+  window.addEventListener('DOMContentLoaded', () => {
+    initTables();
+    updateConditionOptions();
+    initGraphs();
+  });
+</script>
+
+</body>
+</html>
